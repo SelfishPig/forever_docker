@@ -7,10 +7,44 @@ set -euo pipefail
 WOW=/wow
 OUT=/opt/trinitycore/data
 BIN=/opt/trinitycore/bin
-PRODUCT="${CASC_PRODUCT:-wow_classic_beta}"
 
 if [ ! -f "$WOW/.build.info" ] || [ ! -d "$WOW/Data" ]; then
     echo "[extract] ERROR: $WOW must be the 'World of Warcraft' folder (with .build.info and Data). Check WOW_DIR in .env."
+    exit 1
+fi
+
+# The beta used wow_classic_beta/_classic_beta_, while the release client uses
+# wowf/_forever_. Prefer the release product when both are installed, but keep
+# CASC_PRODUCT as an escape hatch for older or unusual installations.
+PRODUCT="${CASC_PRODUCT:-}"
+if [ -z "$PRODUCT" ]; then
+    PRODUCT="$(awk -F'|' '
+        NR == 1 {
+            for (i = 1; i <= NF; i++) {
+                split($i, column, "!")
+                if (column[1] == "Product")
+                    product_column = i
+            }
+            next
+        }
+        product_column && $product_column == "wowf" {
+            print $product_column
+            found = 1
+            exit
+        }
+        product_column && $product_column == "wow_classic_beta" {
+            beta_product = $product_column
+        }
+        END {
+            if (!found && beta_product)
+                print beta_product
+        }
+    ' "$WOW/.build.info")"
+fi
+
+if [ -z "$PRODUCT" ]; then
+    echo "[extract] ERROR: .build.info contains neither the wowf nor wow_classic_beta product."
+    echo "[extract] Set CASC_PRODUCT in .env if this client uses a different product name."
     exit 1
 fi
 

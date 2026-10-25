@@ -1,6 +1,6 @@
 # Forever
 
-A ready-to-run private server for the **World of Warcraft Forever** beta, client build **1.60.1.70450**, with an
+A ready-to-run private server for the **World of Warcraft Forever** beta, client build **1.60.1.70532**, with an
 account sign-up website and a launcher for Windows, Linux and macOS.
 
 I made it to play the free beta with my friends. It is built on the
@@ -27,7 +27,7 @@ a few fixes of my own found with packet logs.
 The launcher and the website are in English, French, Spanish and Portuguese (Latin America), following the system
 or browser language.
 
-**Requirements on the player side**: the game client in exactly build **1.60.1.70450** (World of Warcraft Forever
+**Requirements on the player side**: the game client in exactly build **1.60.1.70532** (World of Warcraft Forever
 beta, installed with Battle.net). Another build will not connect.
 
 **No Blizzard assets**: this repository contains no game client, game data, artwork or logo (only screenshots of the
@@ -48,6 +48,10 @@ docker compose run --rm extractor  # extracts the game data from your client int
 docker compose up -d
 docker compose logs -f worldserver # the first start imports the database (a few minutes)
 ```
+
+`WOW_DIR` is the parent `World of Warcraft` folder containing `.build.info` and `Data`, not the `_forever_`
+subfolder. The extractor automatically selects the `wowf` product used by `_forever_` (and falls back to the old
+`wow_classic_beta` product when needed).
 
 ### Ports
 

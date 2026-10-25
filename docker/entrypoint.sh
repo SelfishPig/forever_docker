@@ -158,7 +158,7 @@ check_certs() {
     fi
 }
 
-# CLIENT_BUILD (e.g. 70450): accepts a client build newer than the branch supports (experimental).
+# CLIENT_BUILD (e.g. 70532): accepts a client build newer than the branch supports (experimental).
 # Written as the last sql/custom/auth file, so worldserver's updater applies it (and re-applies it when the value
 # changes) before the realm list and build list are loaded.
 OVERRIDE_SQL=/src/TrinityCore/sql/custom/auth/2099_12_31_99_auth_client_build_override.sql
@@ -168,7 +168,7 @@ write_client_build_override() {
         return 0
     fi
     if ! [[ "$CLIENT_BUILD" =~ ^[0-9]+$ ]]; then
-        echo "[entrypoint] ERROR: CLIENT_BUILD must be a number (e.g. 70450), got '$CLIENT_BUILD'"
+        echo "[entrypoint] ERROR: CLIENT_BUILD must be a number (e.g. 70532), got '$CLIENT_BUILD'"
         exit 1
     fi
     cat > "$OVERRIDE_SQL" <<SQL
