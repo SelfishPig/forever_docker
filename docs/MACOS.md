@@ -1,10 +1,10 @@
 # The macOS launcher
 
-The native macOS client (`World of Warcraft Beta.app`, universal arm64 + x86_64) is signed with Apple's hardened
+The native macOS client (`World of Warcraft.app`, universal arm64 + x86_64) is signed with Apple's hardened
 runtime, so unlike on Windows and Linux the launcher cannot write the server key into the running game, and the
 key store is not stored in clear in the binary. What the launcher does instead:
 
-1. **Game copy**: `_classic_beta_/World of Warcraft Forever.app` is a copy of the official app, re-signed ad hoc
+1. **Game copy**: `_forever_/World of Warcraft Forever.app` is a copy of the official app, re-signed ad hoc
    without the hardened runtime (original entitlements plus `get-task-allow`, `disable-library-validation`,
    `allow-dyld-environment-variables`). It is redone when the official executable changes (game update).
    The original app is never modified.

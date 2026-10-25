@@ -80,15 +80,15 @@ fn is_client(pid: u32) -> bool {
         .ok()
         .and_then(|p| p.file_name().map(|n| n.to_string_lossy().to_lowercase()))
         .unwrap_or_default();
-    if (argv0.ends_with("/wowb.exe") || argv0 == "wowb.exe") && exe.starts_with("wine") {
+    if (argv0.ends_with("/wow.exe") || argv0 == "wow.exe") && exe.starts_with("wine") {
         return true;
     }
     std::fs::read_to_string(format!("/proc/{pid}/maps"))
-        .map(|m| m.lines().any(|l| l.trim_end().to_lowercase().ends_with("/wowb.exe")))
+        .map(|m| m.lines().any(|l| l.trim_end().to_lowercase().ends_with("/wow.exe")))
         .unwrap_or(false)
 }
 
-/// The game process: the WowB.exe Wine process using the most memory (the launcher stub uses ~30 MB).
+/// The game process: the Wow.exe Wine process using the most memory (the launcher stub uses ~30 MB).
 pub fn find_client() -> Option<ProcessMemory> {
     let me = std::process::id();
     let mut best: Option<(u64, u32)> = None;

@@ -3,6 +3,8 @@ data/*
 !data/.gitkeep
 certs/*
 !certs/.gitkeep
+# Optional local copy used for hand-built launchers; GitHub Actions injects it from FOREVER_CA_CERT.
+app/src-tauri/resources/forever_root_ca.crt
 downloads/*
 !downloads/.gitkeep
 overrides/*.conf

@@ -74,7 +74,7 @@ impl Default for LinuxSettings {
 #[serde(default, rename_all = "camelCase")]
 pub struct Settings {
     pub server: Server,
-    /// The `_classic_beta_` folder (contains WowB.exe, or the game .app on macOS).
+    /// The `_forever_` folder (contains Wow.exe, or the game .app on macOS).
     pub game_dir: String,
     /// textLocale / audioLocale, e.g. frFR.
     pub locale: String,
@@ -146,7 +146,7 @@ impl Settings {
         write_private(&config_dir().join("settings.json"), &serde_json::to_vec_pretty(self).unwrap())
     }
 
-    /// WowB.exe (Windows, Linux/Wine) or the game .app (macOS).
+    /// Wow.exe (Windows, Linux/Wine) or the game .app (macOS).
     pub fn exe(&self) -> PathBuf {
         game_binary(Path::new(&self.game_dir))
     }
@@ -173,7 +173,7 @@ impl Session {
 /// Language the client was installed with, from the Tags column of .build.info next to the game folder.
 pub fn installed_locale(game_dir: &Path) -> Option<String> {
     let info = std::fs::read_to_string(game_dir.parent()?.join(".build.info")).ok()?;
-    let line = info.lines().find(|l| l.contains("wow_classic_beta"))?;
+    let line = info.lines().find(|l| l.contains("wowf"))?;
     LOCALES.iter().find(|l| line.contains(&format!("{l} text"))).map(|l| l.to_string())
 }
 
@@ -186,21 +186,21 @@ pub fn installed_version(game_dir: &Path) -> Option<String> {
     let product = header.iter().position(|c| *c == "Product")?;
     lines
         .map(|l| l.split('|').collect::<Vec<_>>())
-        .find(|row| row.get(product) == Some(&"wow_classic_beta"))
+        .find(|row| row.get(product) == Some(&"wowf"))
         .and_then(|row| row.get(version).map(|v| v.to_string()))
         .filter(|v| !v.is_empty())
 }
 
 #[cfg(not(target_os = "macos"))]
 fn game_binary(dir: &Path) -> PathBuf {
-    dir.join("WowB.exe")
+    dir.join("Wow.exe")
 }
 
 /// Re-signed copy of the game app that the launcher starts on macOS (see macos.rs), next to the original.
 #[cfg(target_os = "macos")]
 pub const MAC_COPY_NAME: &str = "World of Warcraft Forever.app";
 
-/// The first .app in the folder (the Classic beta app name is not fixed), other than the launcher's copy.
+/// The first .app in the folder, other than the launcher's re-signed copy.
 #[cfg(target_os = "macos")]
 fn game_binary(dir: &Path) -> PathBuf {
     std::fs::read_dir(dir)
@@ -225,22 +225,22 @@ fn detect_game_dir() -> Option<String> {
     let mut candidates: Vec<PathBuf> = Vec::new();
     #[cfg(windows)]
     for root in ["C:\\Program Files (x86)", "C:\\Program Files", "D:\\", "D:\\Games", "E:\\", "E:\\Games"] {
-        candidates.push(Path::new(root).join("World of Warcraft").join("_classic_beta_"));
+        candidates.push(Path::new(root).join("World of Warcraft").join("_forever_"));
     }
     #[cfg(target_os = "macos")]
     for root in ["/Applications/World of Warcraft", &home().join("Applications/World of Warcraft").to_string_lossy()] {
-        candidates.push(Path::new(root).join("_classic_beta_"));
+        candidates.push(Path::new(root).join("_forever_"));
     }
     #[cfg(target_os = "linux")]
     {
-        // a Lutris entry that already points at WowB.exe
+        // a Lutris entry that already points at Wow.exe
         if let Ok(dir) = std::fs::read_dir(home().join(".local/share/lutris/games")) {
             for entry in dir.flatten() {
                 if let Ok(text) = std::fs::read_to_string(entry.path()) {
                     for line in text.lines() {
                         if let Some(exe) = line.trim().strip_prefix("exe:") {
                             let exe = exe.trim().trim_matches(|c| c == '\'' || c == '"');
-                            if exe.to_ascii_lowercase().ends_with("wowb.exe") {
+                            if exe.to_ascii_lowercase().ends_with("wow.exe") {
                                 if let Some(parent) = Path::new(exe).parent() {
                                     candidates.push(parent.to_path_buf());
                                 }
@@ -250,8 +250,8 @@ fn detect_game_dir() -> Option<String> {
                 }
             }
         }
-        for p in ["Games/battlenet/drive_c/Program Files (x86)/World of Warcraft/_classic_beta_",
-                  "Games/World of Warcraft/_classic_beta_"] {
+        for p in ["Games/battlenet/drive_c/Program Files (x86)/World of Warcraft/_forever_",
+                  "Games/World of Warcraft/_forever_"] {
             candidates.push(home().join(p));
         }
     }
